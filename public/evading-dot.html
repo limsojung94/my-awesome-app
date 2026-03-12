@@ -81,6 +81,14 @@
       margin-bottom: 1.5rem;
     }
 
+    .score {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      color: #4a5f73;
+      font-size: 1.2rem;
+    }
+
     .caught {
       animation: caught 0.4s ease-out;
     }
@@ -99,15 +107,18 @@
   <div class="game-area" id="gameArea">
     <div class="dot" id="dot"></div>
   </div>
+  <div class="score" id="score">클릭 시도: 0</div>
 
   <script>
     const dot = document.getElementById('dot');
     const gameArea = document.getElementById('gameArea');
     const cursorFollower = document.getElementById('cursorFollower');
+    const scoreEl = document.getElementById('score');
 
     const PADDING = 20;
     const EVADE_RADIUS = 80;
     const DOT_SIZE = 22;
+    let clickAttempts = 0;
 
     function getBounds() {
       const rect = gameArea.getBoundingClientRect();
@@ -180,6 +191,13 @@
       setTimeout(() => dot.classList.remove('caught'), 400);
       const pos = randomPosition();
       setDotPosition(pos.x, pos.y);
+    });
+
+    gameArea.addEventListener('click', (e) => {
+      if (e.target !== dot) {
+        clickAttempts++;
+        scoreEl.textContent = '클릭 시도: ' + clickAttempts;
+      }
     });
 
     const initial = randomPosition();
