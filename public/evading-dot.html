@@ -89,6 +89,76 @@
       font-size: 1.2rem;
     }
 
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 24px;
+    }
+
+    .modal {
+      width: min(520px, 92vw);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(180, 200, 220, 0.8);
+      box-shadow: 0 16px 60px rgba(0, 0, 0, 0.18);
+      padding: 20px 20px 16px;
+    }
+
+    .modal h2 {
+      margin: 0 0 10px;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #1f2a37;
+    }
+
+    .modal p {
+      margin: 0 0 14px;
+      color: #374151;
+      line-height: 1.5;
+    }
+
+    .modal a {
+      display: inline-block;
+      color: #0f4c81;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(212, 232, 240, 0.7);
+      border: 1px solid rgba(180, 200, 220, 0.8);
+    }
+
+    .modal a:hover {
+      background: rgba(212, 232, 240, 0.95);
+    }
+
+    .modal-actions {
+      margin-top: 14px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .modal button {
+      appearance: none;
+      border: 1px solid rgba(180, 200, 220, 0.9);
+      background: rgba(255, 255, 255, 0.9);
+      color: #2d3e50;
+      padding: 10px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .modal button:hover {
+      background: rgba(255, 255, 255, 1);
+    }
+
     .caught {
       animation: caught 0.4s ease-out;
     }
@@ -108,17 +178,53 @@
     <div class="dot" id="dot"></div>
   </div>
   <div class="score" id="score">클릭 시도: 0</div>
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal" role="document" aria-labelledby="modalTitle">
+      <h2 id="modalTitle">할 일 없으세요? 축하합니다!</h2>
+      <p>
+        아래 링크를 눌러 확인해 보세요.
+      </p>
+      <a href="https://link.coupang.com/a/d2OwsJ" target="_blank" rel="noopener noreferrer">
+        쿠팡파트너스 바로가기
+      </a>
+      <div class="modal-actions">
+        <button type="button" id="modalClose">닫기</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     const dot = document.getElementById('dot');
     const gameArea = document.getElementById('gameArea');
     const cursorFollower = document.getElementById('cursorFollower');
     const scoreEl = document.getElementById('score');
+    const modalBackdrop = document.getElementById('modalBackdrop');
+    const modalClose = document.getElementById('modalClose');
 
     const PADDING = 20;
     const EVADE_RADIUS = 80;
     const DOT_SIZE = 22;
     let clickAttempts = 0;
+    const UNLOCK_AFTER = 100;
+    let isUnlocked = false;
+
+    function updateUnlockedState() {
+      isUnlocked = clickAttempts >= UNLOCK_AFTER;
+      scoreEl.textContent = isUnlocked
+        ? `클릭 시도: ${clickAttempts} (해제됨)`
+        : `클릭 시도: ${clickAttempts}`;
+    }
+
+    function openModal() {
+      modalBackdrop.style.display = 'flex';
+      modalBackdrop.setAttribute('aria-hidden', 'false');
+      modalClose.focus();
+    }
+
+    function closeModal() {
+      modalBackdrop.style.display = 'none';
+      modalBackdrop.setAttribute('aria-hidden', 'true');
+    }
 
     function getBounds() {
       const rect = gameArea.getBoundingClientRect();
@@ -171,6 +277,8 @@
       cursorFollower.style.left = (mx - 10) + 'px';
       cursorFollower.style.top = (my - 10) + 'px';
 
+      if (isUnlocked) return;
+
       const center = getDotCenter();
       const dx = center.x - mx;
       const dy = center.y - my;
@@ -187,6 +295,11 @@
 
     dot.addEventListener('click', (e) => {
       e.stopPropagation();
+      if (isUnlocked) {
+        openModal();
+        return;
+      }
+
       dot.classList.add('caught');
       setTimeout(() => dot.classList.remove('caught'), 400);
       const pos = randomPosition();
@@ -196,12 +309,22 @@
     gameArea.addEventListener('click', (e) => {
       if (e.target !== dot) {
         clickAttempts++;
-        scoreEl.textContent = '클릭 시도: ' + clickAttempts;
+        updateUnlockedState();
       }
     });
 
     const initial = randomPosition();
     setDotPosition(initial.x, initial.y);
+
+    modalClose.addEventListener('click', closeModal);
+    modalBackdrop.addEventListener('click', (e) => {
+      if (e.target === modalBackdrop) closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    updateUnlockedState();
   </script>
 </body>
 </html>
