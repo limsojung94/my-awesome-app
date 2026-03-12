@@ -122,19 +122,12 @@
       line-height: 1.5;
     }
 
-    .modal a {
+    .partner-frame {
+      margin: 4px 0 6px;
       display: inline-block;
-      color: #0f4c81;
-      text-decoration: none;
-      font-weight: 600;
-      padding: 10px 12px;
-      border-radius: 12px;
-      background: rgba(212, 232, 240, 0.7);
-      border: 1px solid rgba(180, 200, 220, 0.8);
-    }
-
-    .modal a:hover {
-      background: rgba(212, 232, 240, 0.95);
+      border-radius: 10px;
+      overflow: hidden;
+      line-height: 0;
     }
 
     .modal-actions {
@@ -181,12 +174,9 @@
   <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal" role="document" aria-labelledby="modalTitle">
       <h2 id="modalTitle">할 일 없으세요? 축하합니다!</h2>
-      <p>
-        아래 링크를 눌러 확인해 보세요.
-      </p>
-      <a href="https://link.coupang.com/a/d2OwsJ" target="_blank" rel="noopener noreferrer">
-        쿠팡파트너스 바로가기
-      </a>
+      <div class="partner-frame">
+        <iframe src="https://coupa.ng/clTeOp" width="120" height="240" frameborder="0" scrolling="no" referrerpolicy="unsafe-url" browsingtopics></iframe>
+      </div>
       <div class="modal-actions">
         <button type="button" id="modalClose">닫기</button>
       </div>
